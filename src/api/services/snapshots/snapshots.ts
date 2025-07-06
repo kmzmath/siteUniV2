@@ -1,7 +1,7 @@
 // src/api/services/snapshots/snapshots.ts
 import { BASE_URL } from "@/api/utils/constants";
 // Removi a importação não usada: endpoints
-import { Ranking } from "@/types";
+import { Ranking, AdvancedScores } from "@/types";
 
 // Linha vazia entre grupos de imports
 import { getTeamsPlayers } from "../players";
@@ -35,7 +35,7 @@ export interface HistoricalRankingResponse {
     incerteza: number;
     nota_final: number;
     position: number;
-    scores: Record<string, unknown>;
+    scores: AdvancedScores;
     team_name: string;
     team_id: number;
     university: string;
