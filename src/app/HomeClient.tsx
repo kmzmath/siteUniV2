@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getSnapshotRanking } from "@/api/services/snapshots";
 import { RankingPlacementsList } from "@/ui/organisms";
 import { Ranking } from "@/types";
@@ -16,17 +16,28 @@ interface Snapshot {
 interface HomeClientProps {
   initialRanking: Ranking;
   initialSnapshots: Snapshot[];
+  initialSnapshotId?: number | null;
 }
 
 const HomeClient: React.FC<HomeClientProps> = ({ 
   initialRanking, 
-  initialSnapshots 
+  initialSnapshots,
+  initialSnapshotId = null
 }) => {
   const [currentRanking, setCurrentRanking] = useState<Ranking>(initialRanking);
   const [liveRanking] = useState<Ranking>(initialRanking);
   const [snapshots] = useState<Snapshot[]>(initialSnapshots || []);
-  const [currentSnapshotId, setCurrentSnapshotId] = useState<number | null>(null);
+  const [currentSnapshotId, setCurrentSnapshotId] = useState<number | null>(initialSnapshotId);
   const [loadingSnapshot, setLoadingSnapshot] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Se iniciamos com um snapshot, carregar seus dados
+  useEffect(() => {
+    if (initialSnapshotId !== null && !isInitialized) {
+      setIsInitialized(true);
+      handleSnapshotChange(initialSnapshotId);
+    }
+  }, [initialSnapshotId, isInitialized]);
 
   // Lidar com mudança de snapshot
   const handleSnapshotChange = async (snapshotId: number | null) => {
@@ -62,6 +73,7 @@ const HomeClient: React.FC<HomeClientProps> = ({
         currentSnapshotId={currentSnapshotId}
         onSnapshotChange={handleSnapshotChange}
         loading={loadingSnapshot}
+        isLiveIdenticalToLatest={initialSnapshotId !== null}
       />
 
       <main className={loadingSnapshot ? "opacity-50 transition-opacity" : "transition-opacity"}>

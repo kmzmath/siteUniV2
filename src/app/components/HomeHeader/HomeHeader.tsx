@@ -16,6 +16,7 @@ type HomeHeaderProps = {
   currentSnapshotId: number | null;
   onSnapshotChange: (snapshotId: number | null) => void;
   loading?: boolean;
+  isLiveIdenticalToLatest?: boolean;
 };
 
 const HomeHeader: React.FC<HomeHeaderProps> = ({ 
@@ -23,7 +24,8 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({
   snapshots,
   currentSnapshotId,
   onSnapshotChange,
-  loading = false
+  loading = false,
+  isLiveIdenticalToLatest = false
 }) => {
   const { openModal, closeModal } = useModals();
 
@@ -33,6 +35,10 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({
       <RatingDisclaimerModal closeModal={closeModal} />
     );
   };
+
+  // Determinar se estamos vendo o ranking atual
+  const isViewingCurrent = currentSnapshotId === null || 
+    (isLiveIdenticalToLatest && snapshots[0]?.id === currentSnapshotId);
 
   return (
     <header className="flex flex-col items-center justify-center py-4 sm:py-8 lg:py-10">
@@ -45,13 +51,14 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({
         currentSnapshotId={currentSnapshotId}
         onSnapshotChange={onSnapshotChange}
         loading={loading}
+        isLiveIdenticalToLatest={isLiveIdenticalToLatest}
       />
 
       <Text
         variant="bodySmall"
         className="text-slate-300 text-center mt-1 mb-2"
       >
-        {currentSnapshotId === null 
+        {isViewingCurrent
           ? `Última atualização: ${lastUpdate}`
           : "Visualizando snapshot histórico"
         }

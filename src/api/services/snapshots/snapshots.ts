@@ -27,6 +27,7 @@ export interface HistoricalRankingResponse {
   total_matches: number;
   metadata: any;
   rankings: any[];
+  compared_with_snapshot?: number | null; // Campo adicional do backend
 }
 
 // Buscar lista de snapshots disponíveis
@@ -79,8 +80,9 @@ export const getSnapshotRanking = async (snapshotId: number): Promise<Ranking> =
       team: r.team_name?.split(' (')[0] || '',
       team_id: r.team_id,
       university: r.university,
-      variacao: null,
-      is_new: false
+      // CORREÇÃO: Usar os valores vindos do backend ao invés de null/false
+      variacao: r.variacao !== undefined ? r.variacao : null,
+      is_new: r.is_new !== undefined ? r.is_new : false
     }))
   };
   

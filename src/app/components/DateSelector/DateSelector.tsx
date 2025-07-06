@@ -13,6 +13,7 @@ interface DateSelectorProps {
   currentSnapshotId: number | null;
   onSnapshotChange: (snapshotId: number | null) => void;
   loading?: boolean;
+  isLiveIdenticalToLatest?: boolean;
 }
 
 const DateSelector: React.FC<DateSelectorProps> = ({
@@ -20,23 +21,27 @@ const DateSelector: React.FC<DateSelectorProps> = ({
   currentSnapshotId,
   onSnapshotChange,
   loading = false,
+  isLiveIdenticalToLatest = false,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   // Encontrar o índice do snapshot atual
   useEffect(() => {
-    if (currentSnapshotId === null) {
+    if (currentSnapshotId === null && !isLiveIdenticalToLatest) {
       setCurrentIndex(-1); // -1 indica o ranking ao vivo
+    } else if (currentSnapshotId === null && isLiveIdenticalToLatest && snapshots.length > 0) {
+      // Se o ao vivo é idêntico ao último snapshot, mostrar o primeiro snapshot
+      setCurrentIndex(0);
     } else {
       const index = snapshots?.findIndex(s => s.id === currentSnapshotId) ?? -1;
-      setCurrentIndex(index >= 0 ? index : -1);
+      setCurrentIndex(index >= 0 ? index : 0);
     }
-  }, [currentSnapshotId, snapshots]);
+  }, [currentSnapshotId, snapshots, isLiveIdenticalToLatest]);
 
   const handlePrevious = () => {
     if (loading || !snapshots) return;
     
-    if (currentIndex === -1) {
+    if (currentIndex === -1 && !isLiveIdenticalToLatest) {
       // Do ranking ao vivo para o snapshot mais recente
       if (snapshots.length > 0) {
         setCurrentIndex(0);
@@ -58,14 +63,14 @@ const DateSelector: React.FC<DateSelectorProps> = ({
       const newIndex = currentIndex - 1;
       setCurrentIndex(newIndex);
       onSnapshotChange(snapshots[newIndex].id);
-    } else if (currentIndex === 0) {
+    } else if (currentIndex === 0 && !isLiveIdenticalToLatest) {
       // Do primeiro snapshot para o ranking ao vivo
       setCurrentIndex(-1);
       onSnapshotChange(null);
     }
   };
 
-  const formatDate = (dateString: string | null) => {
+  const formatDate = (dateString: string | null, isLatest: boolean = false) => {
     if (!dateString) return "Ranking Ao Vivo";
     
     try {
@@ -73,7 +78,14 @@ const DateSelector: React.FC<DateSelectorProps> = ({
       const day = date.getDate().toString().padStart(2, '0');
       const month = (date.getMonth() + 1).toString().padStart(2, '0');
       const year = date.getFullYear();
-      return `${day}/${month}/${year}`;
+      const formattedDate = `${day}/${month}/${year}`;
+      
+      // Se for o mais recente e o ao vivo for idêntico, adicionar indicador
+      if (isLatest && isLiveIdenticalToLatest) {
+        return `${formattedDate} (Atual)`;
+      }
+      
+      return formattedDate;
     } catch {
       return "Data inválida";
     }
@@ -87,10 +99,12 @@ const DateSelector: React.FC<DateSelectorProps> = ({
     return null;
   };
 
+  const isLatestSnapshot = currentIndex === 0;
   const canGoPrevious = currentIndex < (snapshots?.length ?? 0) - 1;
-  const canGoNext = currentIndex > -1;
+  const canGoNext = isLiveIdenticalToLatest ? currentIndex > 0 : currentIndex > -1;
 
-  const isLive = currentIndex === -1;
+  const isLive = currentIndex === -1 && !isLiveIdenticalToLatest;
+  const isCurrentLive = isLive || (isLatestSnapshot && isLiveIdenticalToLatest);
 
   return (
     <div className="flex items-center justify-center gap-4 py-4">
@@ -107,14 +121,14 @@ const DateSelector: React.FC<DateSelectorProps> = ({
         <ChevronLeft size={24} />
       </button>
 
-      <div className="flex items-center gap-2 min-w-[200px] justify-center">
+      <div className="flex items-center gap-2 min-w-[220px] justify-center">
         <Calendar size={20} className="text-slate-400" />
         <span className={`text-lg font-medium ${loading ? "opacity-50" : ""} ${
-          isLive ? "text-green-400" : "text-white"
+          isCurrentLive ? "text-green-400" : "text-white"
         }`}>
-          {loading ? "Carregando..." : formatDate(getCurrentDate())}
+          {loading ? "Carregando..." : formatDate(getCurrentDate(), isLatestSnapshot)}
         </span>
-        {isLive && !loading && (
+        {isCurrentLive && !loading && (
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
