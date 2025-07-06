@@ -1,3 +1,4 @@
+// src/api/services/matches/utils/adapters.ts
 import { createDateValue } from "@/api/utils/functions";
 import { Match, MatchTeam, RemoteMatch, RemoteMatchTeam } from "@/types";
 
@@ -10,9 +11,14 @@ export const teamMatchInfoAdapter = (
   const { id, score, team, agent_1, agent_2, agent_3, agent_4, agent_5 } =
     teamMatchInfo;
 
-  // Filtra agentes vazios/null e converte para lowercase
+  // Filtra agentes vazios/null/"?" e converte para lowercase
   const agents = [agent_1, agent_2, agent_3, agent_4, agent_5]
-    .filter((agent): agent is string => agent !== null && agent !== undefined && agent.trim() !== "")
+    .filter((agent): agent is string => 
+      agent !== null && 
+      agent !== undefined && 
+      agent.trim() !== "" && 
+      agent !== "?"  // Adiciona filtro para "?"
+    )
     .map((agent) => agent.toLowerCase().trim());
 
   return {
