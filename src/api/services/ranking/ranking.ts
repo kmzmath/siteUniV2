@@ -1,5 +1,6 @@
 import { BASE_URL } from "@/api/utils/constants";
 import endpoints from "@/api/utils/endpoints";
+import { createDateValue } from "@/api/utils/functions";
 import { RemoteRanking } from "@/types";
 
 import { getTeamsPlayers } from "../players";
@@ -48,10 +49,7 @@ export const getRanking = async () => {
     console.error("Erro ao buscar ranking:", error);
     // Retorna um ranking vazio em caso de erro
     return {
-      lastUpdate: {
-        raw: new Date().toISOString(),
-        formatted: new Date().toLocaleString('pt-BR'),
-      },
+      lastUpdate: createDateValue(new Date().toISOString()),
       placements: []
     };
   }
