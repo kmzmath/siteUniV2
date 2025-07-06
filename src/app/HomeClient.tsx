@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+
 import { getSnapshotRanking } from "@/api/services/snapshots";
-import { RankingPlacementsList } from "@/ui/organisms";
 import { Ranking } from "@/types";
+
+import { RankingPlacementsList } from "@/ui/organisms";
 import { HomeFooter, HomeHeader } from "./components";
 
 interface Snapshot {
@@ -31,14 +33,6 @@ const HomeClient: React.FC<HomeClientProps> = ({
   const [loadingSnapshot, setLoadingSnapshot] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Se iniciamos com um snapshot, carregar seus dados
-  useEffect(() => {
-    if (initialSnapshotId !== null && !isInitialized) {
-      setIsInitialized(true);
-      handleSnapshotChange(initialSnapshotId);
-    }
-  }, [initialSnapshotId, isInitialized]);
-
   // Lidar com mudança de snapshot
   const handleSnapshotChange = async (snapshotId: number | null) => {
     try {
@@ -64,6 +58,14 @@ const HomeClient: React.FC<HomeClientProps> = ({
       setLoadingSnapshot(false);
     }
   };
+
+  // Se iniciamos com um snapshot, carregar seus dados
+  useEffect(() => {
+    if (initialSnapshotId !== null && !isInitialized) {
+      setIsInitialized(true);
+      handleSnapshotChange(initialSnapshotId);
+    }
+  }, [initialSnapshotId, isInitialized, handleSnapshotChange]); // Adicionado handleSnapshotChange
 
   return (
     <div className="min-h-screen px-2 font-[family-name:var(--font-geist-sans)] sm:px-4 lg:px-8">

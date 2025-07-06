@@ -1,5 +1,6 @@
 import mainApi from "@/api";
 import { getSnapshotsRaw } from "@/api/services/snapshots/snapshotsApi";
+
 import HomeClient from "./HomeClient";
 
 const Home: React.FC = async () => {

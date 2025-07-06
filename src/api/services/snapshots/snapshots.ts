@@ -1,17 +1,19 @@
 // src/api/services/snapshots/snapshots.ts
 import { BASE_URL } from "@/api/utils/constants";
-import endpoints from "@/api/utils/endpoints";
+// Removi a importação não usada: endpoints
 import { Ranking } from "@/types";
+
+// Linha vazia entre grupos de imports
+import { rankingAdapter } from "../ranking/utils/adapters";
 import { getTeams } from "../teams";
 import { getTeamsPlayers } from "../players";
-import { rankingAdapter } from "../ranking/utils/adapters";
 
 export interface RankingSnapshot {
   id: number;
   created_at: string;
   total_matches: number;
   total_teams: number;
-  metadata?: any;
+  metadata?: Record<string, unknown>; // Substituído any por tipo específico
 }
 
 export interface SnapshotsResponse {
@@ -25,9 +27,22 @@ export interface HistoricalRankingResponse {
   created_at: string;
   total_teams: number;
   total_matches: number;
-  metadata: any;
-  rankings: any[];
-  compared_with_snapshot?: number | null; // Campo adicional do backend
+  metadata: Record<string, unknown>; // Substituído any por tipo específico
+  rankings: Array<{
+    ci_lower: number;
+    ci_upper: number;
+    games_count: number;
+    incerteza: number;
+    nota_final: number;
+    position: number;
+    scores: Record<string, unknown>;
+    team_name: string;
+    team_id: number;
+    university: string;
+    variacao?: number | null;
+    is_new?: boolean;
+  }>; // Substituído any[] por tipo específico
+  compared_with_snapshot?: number | null;
 }
 
 // Buscar lista de snapshots disponíveis
