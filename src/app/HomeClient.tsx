@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import { getSnapshotRanking } from "@/api/services/snapshots";
 import { Ranking } from "@/types";
-
 import { RankingPlacementsList } from "@/ui/organisms";
+
 import { HomeFooter, HomeHeader } from "./components";
 
 interface Snapshot {
@@ -34,7 +34,7 @@ const HomeClient: React.FC<HomeClientProps> = ({
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Lidar com mudança de snapshot
-  const handleSnapshotChange = async (snapshotId: number | null) => {
+  const handleSnapshotChange = useCallback(async (snapshotId: number | null) => {
     try {
       setLoadingSnapshot(true);
       
@@ -57,7 +57,7 @@ const HomeClient: React.FC<HomeClientProps> = ({
     } finally {
       setLoadingSnapshot(false);
     }
-  };
+  }, [liveRanking]);
 
   // Se iniciamos com um snapshot, carregar seus dados
   useEffect(() => {
@@ -65,7 +65,7 @@ const HomeClient: React.FC<HomeClientProps> = ({
       setIsInitialized(true);
       handleSnapshotChange(initialSnapshotId);
     }
-  }, [initialSnapshotId, isInitialized, handleSnapshotChange]); // Adicionado handleSnapshotChange
+  }, [initialSnapshotId, isInitialized, handleSnapshotChange]);
 
   return (
     <div className="min-h-screen px-2 font-[family-name:var(--font-geist-sans)] sm:px-4 lg:px-8">

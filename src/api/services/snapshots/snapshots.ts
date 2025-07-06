@@ -4,9 +4,9 @@ import { BASE_URL } from "@/api/utils/constants";
 import { Ranking } from "@/types";
 
 // Linha vazia entre grupos de imports
+import { getTeamsPlayers } from "../players";
 import { rankingAdapter } from "../ranking/utils/adapters";
 import { getTeams } from "../teams";
-import { getTeamsPlayers } from "../players";
 
 export interface RankingSnapshot {
   id: number;
